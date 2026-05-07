@@ -100,6 +100,11 @@ Absen Pulang
 const URL_SCRIPT =
 "https://script.google.com/macros/s/AKfycbxRr7dikPr7b6TAa3wlfFbi7D2wCQyo6JLREMYiev40Kvzws61xl2HCortJaDgSnWJzrw/exec";
 
+const KANTOR_LAT = -7.3244239;
+const KANTOR_LNG = 108.3313482;
+
+const MAX_RADIUS = 100;
+
 const video =
 document.getElementById("video");
 
@@ -210,6 +215,41 @@ function ambilFoto(){
   return canvas.toDataURL("image/jpeg");
 }
 
+function hitungJarak(lat1,lng1,lat2,lng2){
+
+  const R = 6371e3;
+
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+
+  const Δφ =
+    (lat2-lat1) * Math.PI/180;
+
+  const Δλ =
+    (lng2-lng1) * Math.PI/180;
+
+  const a =
+    Math.sin(Δφ/2) *
+    Math.sin(Δφ/2)
+
+    +
+
+    Math.cos(φ1) *
+    Math.cos(φ2) *
+
+    Math.sin(Δλ/2) *
+    Math.sin(Δλ/2);
+
+  const c =
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    );
+
+  return R * c;
+}
+
 async function kirimData(aksi){
 
   const nama =
@@ -242,6 +282,26 @@ async function kirimData(aksi){
 
   const lokasi =
     await ambilLokasi();
+
+const jarak =
+  hitungJarak(
+
+    lokasi.latitude,
+    lokasi.longitude,
+
+    KANTOR_LAT,
+    KANTOR_LNG
+
+  );
+
+if(jarak > MAX_RADIUS){
+
+  alert(
+    "Anda berada di luar radius kantor"
+  );
+
+  return;
+}
 
   const foto =
     ambilFoto();
