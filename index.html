@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Absen Piket Malam LPSE</title>
+
+<style>
+
+body{
+  font-family:Arial;
+  background:#f4f6f9;
+  padding:20px;
+}
+
+.container{
+  max-width:400px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+h2{
+  text-align:center;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.masuk{
+  background:#28a745;
+}
+
+.pulang{
+  background:#dc3545;
+}
+
+video{
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.status{
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+  color:#007bff;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>ABSEN PIKET MALAM LPSE</h2>
+
+<div class="status" id="statusJam"></div>
+
+<input type="text" id="nama" placeholder="Masukkan Nama">
+
+<video id="video" autoplay playsinline></video>
+
+<button class="masuk" onclick="absenMasuk()">
+Absen Masuk
+</button>
+
+<button class="pulang" onclick="absenPulang()">
+Absen Pulang
+</button>
+
+</div>
+
+<script>
+
+const URL_SCRIPT =
+"https://script.google.com/macros/s/AKfycbxRr7dikPr7b6TAa3wlfFbi7D2wCQyo6JLREMYiev40Kvzws61xl2HCortJaDgSnWJzrw/exec";
+
+const video =
+document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({
+  video:true
+})
+.then(stream=>{
+  video.srcObject = stream;
+});
+
+updateStatusJam();
+
+setInterval(updateStatusJam,1000);
+
+function updateStatusJam(){
+
+  const status =
+    document.getElementById("statusJam");
+
+  const now = new Date();
+
+  const menit =
+    now.getHours()*60+
+    now.getMinutes();
+
+  if(menit >= 1080 && menit <= 1350){
+    status.innerHTML =
+      "Waktu Absen Masuk";
+  }
+  else if(menit >= 180 && menit <= 360){
+    status.innerHTML =
+      "Waktu Absen Pulang";
+  }
+  else{
+    status.innerHTML =
+      "Di luar jam absensi";
+  }
+}
+
+function cekJamMasuk(){
+
+  const now = new Date();
+
+  const menit =
+    now.getHours()*60+
+    now.getMinutes();
+
+  return menit >= 1080 &&
+         menit <= 1350;
+}
+
+function cekJamPulang(){
+
+  const now = new Date();
+
+  const menit =
+    now.getHours()*60+
+    now.getMinutes();
+
+  return menit >= 180 &&
+         menit <= 360;
+}
+
+async function ambilLokasi(){
+
+  return new Promise((resolve,reject)=>{
+
+    navigator.geolocation.getCurrentPosition(
+
+      position=>{
+
+        resolve({
+          latitude:
+            position.coords.latitude,
+
+          longitude:
+            position.coords.longitude
+        });
+      },
+
+      error=>{
+        reject(error);
+      }
+
+    );
+
+  });
+
+}
+
+function ambilFoto(){
+
+  const canvas =
+    document.createElement("canvas");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx =
+    canvas.getContext("2d");
+
+  ctx.drawImage(
+    video,
+    0,
+    0
+  );
+
+  return canvas.toDataURL("image/jpeg");
+}
+
+async function kirimData(aksi){
+
+  const nama =
+    document.getElementById("nama").value;
+
+  if(nama === ""){
+    alert("Nama wajib diisi");
+    return;
+  }
+
+  if(
+    aksi === "masuk" &&
+    !cekJamMasuk()
+  ){
+    alert(
+      "Absen masuk hanya jam 18.00-22.30"
+    );
+    return;
+  }
+
+  if(
+    aksi === "pulang" &&
+    !cekJamPulang()
+  ){
+    alert(
+      "Absen pulang hanya jam 03.00-06.00"
+    );
+    return;
+  }
+
+  const lokasi =
+    await ambilLokasi();
+
+  const foto =
+    ambilFoto();
+
+  const response =
+    await fetch(URL_SCRIPT,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        nama:nama,
+        aksi:aksi,
+
+        latitude:
+          lokasi.latitude,
+
+        longitude:
+          lokasi.longitude,
+
+        foto:foto
+
+      })
+
+    });
+
+  const hasil =
+    await response.text();
+
+  alert(hasil);
+
+  document.getElementById("nama").value="";
+}
+
+function absenMasuk(){
+  kirimData("masuk");
+}
+
+function absenPulang(){
+  kirimData("pulang");
+}
+
+</script>
+
+</body>
+</html>
