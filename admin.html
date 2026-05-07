@@ -88,6 +88,14 @@ th,td{
 
 </style>
 
+<link
+ rel="stylesheet"
+ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script
+ src="https://unpkg.com/leaflet/dist/leaflet.js">
+</script>
+
 </head>
 
 <body>
@@ -157,6 +165,15 @@ Export Excel
 
 </div>
 
+<div
+ id="map"
+ style="
+  height:400px;
+  margin-top:20px;
+  border-radius:12px;
+ ">
+</div>
+
 <table id="tabel">
 
 <thead>
@@ -187,6 +204,16 @@ const PASSWORD_ADMIN =
 "admin123";
 
 let semuaData = [];
+
+let map =
+L.map('map').setView(
+  [-7.3244239,108.3313482],
+  15
+);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map);
 
 function login(){
 
@@ -240,6 +267,28 @@ function tampilkanData(data){
   let totalPulang = 0;
 
   data.forEach(item=>{
+
+if(
+ item.Latitude &&
+ item.Longitude
+){
+
+ L.marker([
+   item.Latitude,
+   item.Longitude
+ ])
+
+ .addTo(map)
+
+ .bindPopup(
+   `
+   <b>${item.Nama}</b>
+   <br>
+   ${item.Status}
+   `
+ );
+
+}
 
     if(item.Status === "MASUK")
       totalMasuk++;
