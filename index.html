@@ -103,7 +103,7 @@ const URL_SCRIPT =
 const KANTOR_LAT = -7.3244239;
 const KANTOR_LNG = 108.3313482;
 
-const MAX_RADIUS = 100;
+const MAX_RADIUS = 50;
 
 const video =
 document.getElementById("video");
@@ -130,7 +130,7 @@ function updateStatusJam(){
     now.getHours()*60+
     now.getMinutes();
 
-  if(menit >= 1080 && menit <= 1350){
+  if(menit >= 1080 && menit <= 1439){
     status.innerHTML =
       "Waktu Absen Masuk";
   }
@@ -153,7 +153,7 @@ function cekJamMasuk(){
     now.getMinutes();
 
   return menit >= 1080 &&
-         menit <= 1350;
+         menit <= 1439;
 }
 
 function cekJamPulang(){
@@ -265,7 +265,7 @@ async function kirimData(aksi){
     !cekJamMasuk()
   ){
     alert(
-      "Absen masuk hanya jam 18.00-22.30"
+      "Absen masuk hanya jam 18.00-23.59"
     );
     return;
   }
