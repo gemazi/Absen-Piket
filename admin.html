@@ -167,6 +167,9 @@ Export Excel
 <th>Jam Masuk</th>
 <th>Jam Pulang</th>
 <th>Status</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Foto</th>
 </tr>
 
 </thead>
@@ -250,6 +253,41 @@ function tampilkanData(data){
         <td>${item["Jam Masuk"]}</td>
         <td>${item["Jam Pulang"]}</td>
         <td>${item.Status}</td>
+		<td>
+		${item.Latitude || "-"}
+		</td>
+
+		<td>
+		${item.Longitude || "-"}
+		</td>
+
+		<td>
+
+		${item.Foto ?
+
+`
+
+<a href="${item.Foto}" target="_blank">
+
+<img
+  src="${item.Foto}"
+  width="80"
+  style="
+    border-radius:10px;
+    border:1px solid #ccc;
+  ">
+
+</a>
+
+`
+
+:
+
+"-"
+
+}
+
+</td>
       </tr>
     `;
   });
