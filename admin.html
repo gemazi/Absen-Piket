@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+
+body{
+  font-family:Arial;
+  background:#f4f6f9;
+  padding:20px;
+}
+
+.login,
+.dashboard{
+  max-width:900px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+button{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.loginBtn{
+  background:#007bff;
+  width:100%;
+}
+
+.exportBtn{
+  background:#28a745;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+table,th,td{
+  border:1px solid #ccc;
+}
+
+th,td{
+  padding:8px;
+  text-align:center;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+.card{
+  flex:1;
+  min-width:150px;
+  background:#007bff;
+  color:white;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login" id="loginBox">
+
+<h2>LOGIN ADMIN</h2>
+
+<input
+  type="password"
+  id="password"
+  placeholder="Masukkan Password">
+
+<button
+  class="loginBtn"
+  onclick="login()">
+
+Masuk
+
+</button>
+
+</div>
+
+<div
+  class="dashboard"
+  id="dashboard"
+  style="display:none;">
+
+<h2>DASHBOARD ABSENSI</h2>
+
+<input
+  type="date"
+  id="filterTanggal">
+
+<button
+  class="exportBtn"
+  onclick="filterData()">
+
+Filter
+
+</button>
+
+<button
+  class="exportBtn"
+  onclick="exportExcel()">
+
+Export Excel
+
+</button>
+
+<div class="stats">
+
+<div class="card">
+<h3 id="totalData">0</h3>
+<p>Total Absensi</p>
+</div>
+
+<div class="card">
+<h3 id="totalMasuk">0</h3>
+<p>Masuk</p>
+</div>
+
+<div class="card">
+<h3 id="totalPulang">0</h3>
+<p>Pulang</p>
+</div>
+
+</div>
+
+<table id="tabel">
+
+<thead>
+
+<tr>
+<th>Nama</th>
+<th>Tanggal</th>
+<th>Jam Masuk</th>
+<th>Jam Pulang</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const PASSWORD_ADMIN =
+"admin123";
+
+let semuaData = [];
+
+function login(){
+
+  const password =
+    document.getElementById(
+      "password"
+    ).value;
+
+  if(password === PASSWORD_ADMIN){
+
+    document.getElementById(
+      "loginBox"
+    ).style.display="none";
+
+    document.getElementById(
+      "dashboard"
+    ).style.display="block";
+
+    loadData();
+
+  }
+  else{
+    alert("Password salah");
+  }
+}
+
+async function loadData(){
+
+  const sheetURL =
+"https://opensheet.elk.sh/17PWqtCsh2iHd4HQVeBaDjwbz32FonGo6aC8GZvb-6DU/Sheet1";
+
+  const response =
+    await fetch(sheetURL);
+
+  semuaData =
+    await response.json();
+
+  tampilkanData(semuaData);
+}
+
+function tampilkanData(data){
+
+  const tbody =
+    document.querySelector(
+      "#tabel tbody"
+    );
+
+  tbody.innerHTML="";
+
+  let totalMasuk = 0;
+  let totalPulang = 0;
+
+  data.forEach(item=>{
+
+    if(item.Status === "MASUK")
+      totalMasuk++;
+
+    if(item.Status === "PULANG")
+      totalPulang++;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.Nama}</td>
+        <td>${item["Tanggal Masuk"]}</td>
+        <td>${item["Jam Masuk"]}</td>
+        <td>${item["Jam Pulang"]}</td>
+        <td>${item.Status}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById(
+    "totalData"
+  ).innerHTML =
+    data.length;
+
+  document.getElementById(
+    "totalMasuk"
+  ).innerHTML =
+    totalMasuk;
+
+  document.getElementById(
+    "totalPulang"
+  ).innerHTML =
+    totalPulang;
+}
+
+function filterData(){
+
+  const tanggal =
+    document.getElementById(
+      "filterTanggal"
+    ).value;
+
+  if(tanggal === ""){
+
+    tampilkanData(
+      semuaData
+    );
+
+    return;
+  }
+
+  const tgl =
+    tanggal.split("-")
+    .reverse()
+    .join("/");
+
+  const hasil =
+    semuaData.filter(item=>
+      item["Tanggal Masuk"] === tgl
+    );
+
+  tampilkanData(hasil);
+}
+
+function exportExcel(){
+
+  const table =
+    document.getElementById(
+      "tabel"
+    );
+
+  const wb =
+    XLSX.utils.table_to_book(
+      table,
+      {sheet:"Absensi"}
+    );
+
+  XLSX.writeFile(
+    wb,
+    "Rekap_Absensi.xlsx"
+  );
+}
+
+</script>
+
+</body>
+</html>
