@@ -169,6 +169,7 @@ Export Excel
 <th>Status</th>
 <th>Latitude</th>
 <th>Longitude</th>
+<th>Posisi Maps</th>
 <th>Foto</th>
 </tr>
 
@@ -260,7 +261,37 @@ function tampilkanData(data){
 		<td>
 		${item.Longitude || "-"}
 		</td>
+		<td>
 
+		${item.Latitude && item.Longitude ?
+
+`
+
+<a
+  href="https://www.google.com/maps?q=${item.Latitude},${item.Longitude}"
+  target="_blank"
+  style="
+    background:#007bff;
+    color:white;
+    padding:6px 10px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:12px;
+  ">
+
+Lihat Maps
+
+</a>
+
+`
+
+:
+
+"-"
+
+}
+
+</td>
 		<td>
 
 		${item.Foto ?
