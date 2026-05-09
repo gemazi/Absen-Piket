@@ -89,7 +89,10 @@ button:disabled{
 
 <div class="status" id="statusJam"></div>
 
-<input type="text" id="nama" placeholder="Masukkan Nama">
+<input
+  type="text"
+  id="nama"
+  placeholder="Masukkan Nama">
 
 <video id="video" autoplay playsinline></video>
 
@@ -149,6 +152,11 @@ function updateStatusJam(){
     document.getElementById(
       'btnPulang'
     );
+	
+	const inputNama =
+  document.getElementById(
+    'nama'
+  );
 
   if(cekJamMasuk()){
 
@@ -158,6 +166,8 @@ function updateStatusJam(){
     btnMasuk.disabled = false;
 
     btnPulang.disabled = true;
+	
+	inputNama.disabled = false;
 
   }
 
@@ -169,6 +179,8 @@ function updateStatusJam(){
     btnMasuk.disabled = true;
 
     btnPulang.disabled = false;
+	
+	inputNama.disabled = false;
 
   }
 
@@ -180,6 +192,8 @@ function updateStatusJam(){
     btnMasuk.disabled = true;
 
     btnPulang.disabled = true;
+	
+	inputNama.disabled = true;
 
   }
 
