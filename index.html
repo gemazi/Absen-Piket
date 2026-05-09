@@ -68,7 +68,15 @@ video{
   font-weight:bold;
   color:#007bff;
 }
+button:disabled{
 
+  background:#999 !important;
+
+  cursor:not-allowed;
+
+  opacity:0.7;
+
+}
 </style>
 
 </head>
@@ -85,11 +93,17 @@ video{
 
 <video id="video" autoplay playsinline></video>
 
-<button class="masuk" onclick="absenMasuk()">
+<button
+  id="btnMasuk"
+  class="masuk"
+  onclick="absenMasuk()">
 Absen Masuk
 </button>
 
-<button class="pulang" onclick="absenPulang()">
+<button
+  id="btnPulang"
+  class="pulang"
+  onclick="absenPulang()">
 Absen Pulang
 </button>
 
@@ -122,26 +136,53 @@ setInterval(updateStatusJam,1000);
 function updateStatusJam(){
 
   const status =
-    document.getElementById("statusJam");
+    document.getElementById(
+      'statusJam'
+    );
 
-  const now = new Date();
+  const btnMasuk =
+    document.getElementById(
+      'btnMasuk'
+    );
 
-  const menit =
-    now.getHours()*60+
-    now.getMinutes();
+  const btnPulang =
+    document.getElementById(
+      'btnPulang'
+    );
 
-  if(menit >= 1080 && menit <= 1439){
+  if(cekJamMasuk()){
+
     status.innerHTML =
-      "Waktu Absen Masuk";
+      'Waktu Absen Masuk Sedang Aktif';
+
+    btnMasuk.disabled = false;
+
+    btnPulang.disabled = true;
+
   }
-  else if(menit >= 180 && menit <= 360){
+
+  else if(cekJamPulang()){
+
     status.innerHTML =
-      "Waktu Absen Pulang";
+      'Waktu Absen Pulang Sedang Aktif';
+
+    btnMasuk.disabled = true;
+
+    btnPulang.disabled = false;
+
   }
+
   else{
+
     status.innerHTML =
-      "Di luar jam absensi";
+      'Di luar jam absensi';
+
+    btnMasuk.disabled = true;
+
+    btnPulang.disabled = true;
+
   }
+
 }
 
 function cekJamMasuk(){
