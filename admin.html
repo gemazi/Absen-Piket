@@ -302,11 +302,17 @@ if(
 
 }
 
-    if(item.Status === "MASUK")
-      totalMasuk++;
+    const hadirPiket =
 
-    if(item.Status === "PULANG")
-      totalPulang++;
+	item["Jam Masuk"] &&
+	item["Jam Pulang"];
+
+	if(hadirPiket){
+		totalMasuk++;
+}
+	else{
+		totalPulang++;
+}
 
     tbody.innerHTML += `
       <tr>
@@ -315,7 +321,44 @@ if(
         <td>${item["Jam Masuk"]}</td>
 		<td>${item["Tanggal Pulang"]}</td>
         <td>${item["Jam Pulang"]}</td>
-        <td>${item.Status}</td>
+        <td>
+
+${
+
+item["Jam Masuk"] &&
+item["Jam Pulang"]
+
+?
+
+`
+<span style="
+  background:#28a745;
+  color:white;
+  padding:5px 10px;
+  border-radius:8px;
+  font-size:12px;
+">
+Hadir Piket
+</span>
+`
+
+:
+
+`
+<span style="
+  background:#dc3545;
+  color:white;
+  padding:5px 10px;
+  border-radius:8px;
+  font-size:12px;
+">
+Tidak Piket
+</span>
+`
+
+}
+
+</td>
 		<td>
 		${item.Latitude || "-"}
 		</td>
