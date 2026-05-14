@@ -415,20 +415,9 @@ async function kirimData(aksi){
     // AMBIL FOTO
     // =========================
 
-    await new Promise(
-  r => setTimeout(r,500)
-);
-	const foto =
+    const foto =
   ambilFoto();
-
-if(!foto){
-
-  alert(
-    "Foto gagal diambil"
-  );
-
-  return;
-}
+  
     // =========================
     // KIRIM DATA
     // =========================
