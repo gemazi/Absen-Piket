@@ -68,15 +68,13 @@ video{
   font-weight:bold;
   color:#007bff;
 }
+
 button:disabled{
-
   background:#999 !important;
-
   cursor:not-allowed;
-
   opacity:0.7;
-
 }
+
 </style>
 
 </head>
@@ -114,16 +112,42 @@ Absen Pulang
 
 <script>
 
+// =========================
+// URL WEB APP APPS SCRIPT
+// =========================
+
 const URL_SCRIPT =
 "https://script.google.com/macros/s/AKfycbzFeEvFaAdZDImh4PBHJ1Z6Su05ujYbOL_P7IuiT5G9xkTk9-scOOXDzRB-YMkjXGT9AA/exec";
+
+// =========================
+// KOORDINAT KANTOR
+// =========================
 
 const KANTOR_LAT = -7.3244239;
 const KANTOR_LNG = 108.3313482;
 
+// =========================
+// RADIUS ABSEN
+// =========================
+
 const MAX_RADIUS = 50;
+
+// =========================
+// TEST MODE
+// true  = bebas jam & lokasi
+// false = aturan normal aktif
+// =========================
+
+const TEST_MODE = true;
+
+// =========================
 
 const video =
 document.getElementById("video");
+
+// =========================
+// AKTIFKAN KAMERA
+// =========================
 
 navigator.mediaDevices.getUserMedia({
   video:true
@@ -132,9 +156,15 @@ navigator.mediaDevices.getUserMedia({
   video.srcObject = stream;
 });
 
+// =========================
+
 updateStatusJam();
 
 setInterval(updateStatusJam,1000);
+
+// =========================
+// UPDATE STATUS JAM
+// =========================
 
 function updateStatusJam(){
 
@@ -152,11 +182,31 @@ function updateStatusJam(){
     document.getElementById(
       'btnPulang'
     );
-	
-	const inputNama =
-  document.getElementById(
-    'nama'
-  );
+
+  const inputNama =
+    document.getElementById(
+      'nama'
+    );
+
+  // =========================
+  // MODE TEST
+  // =========================
+
+  if(TEST_MODE){
+
+    status.innerHTML =
+      'MODE TEST AKTIF';
+
+    btnMasuk.disabled = false;
+    btnPulang.disabled = false;
+    inputNama.disabled = false;
+
+    return;
+  }
+
+  // =========================
+  // MODE NORMAL
+  // =========================
 
   if(cekJamMasuk()){
 
@@ -164,10 +214,9 @@ function updateStatusJam(){
       'Waktu Absen Masuk Sedang Aktif';
 
     btnMasuk.disabled = false;
-
     btnPulang.disabled = true;
-	
-	inputNama.disabled = false;
+
+    inputNama.disabled = false;
 
   }
 
@@ -177,10 +226,9 @@ function updateStatusJam(){
       'Waktu Absen Pulang Sedang Aktif';
 
     btnMasuk.disabled = true;
-
     btnPulang.disabled = false;
-	
-	inputNama.disabled = false;
+
+    inputNama.disabled = false;
 
   }
 
@@ -190,14 +238,18 @@ function updateStatusJam(){
       'Di luar jam absensi';
 
     btnMasuk.disabled = true;
-
     btnPulang.disabled = true;
-	
-	inputNama.disabled = true;
+
+    inputNama.disabled = true;
 
   }
 
 }
+
+// =========================
+// CEK JAM MASUK
+// 18:00 - 23:59
+// =========================
 
 function cekJamMasuk(){
 
@@ -211,6 +263,11 @@ function cekJamMasuk(){
          menit <= 1439;
 }
 
+// =========================
+// CEK JAM PULANG
+// 03:00 - 06:00
+// =========================
+
 function cekJamPulang(){
 
   const now = new Date();
@@ -222,6 +279,10 @@ function cekJamPulang(){
   return menit >= 180 &&
          menit <= 360;
 }
+
+// =========================
+// AMBIL LOKASI
+// =========================
 
 async function ambilLokasi(){
 
@@ -238,6 +299,7 @@ async function ambilLokasi(){
           longitude:
             position.coords.longitude
         });
+
       },
 
       error=>{
@@ -249,6 +311,10 @@ async function ambilLokasi(){
   });
 
 }
+
+// =========================
+// AMBIL FOTO
+// =========================
 
 function ambilFoto(){
 
@@ -270,6 +336,10 @@ function ambilFoto(){
   return canvas.toDataURL("image/jpeg");
 }
 
+// =========================
+// HITUNG JARAK
+// =========================
+
 function hitungJarak(lat1,lng1,lat2,lng2){
 
   const R = 6371e3;
@@ -284,6 +354,7 @@ function hitungJarak(lat1,lng1,lat2,lng2){
     (lng2-lng1) * Math.PI/180;
 
   const a =
+
     Math.sin(Δφ/2) *
     Math.sin(Δφ/2)
 
@@ -296,6 +367,7 @@ function hitungJarak(lat1,lng1,lat2,lng2){
     Math.sin(Δλ/2);
 
   const c =
+
     2 *
     Math.atan2(
       Math.sqrt(a),
@@ -304,6 +376,10 @@ function hitungJarak(lat1,lng1,lat2,lng2){
 
   return R * c;
 }
+
+// =========================
+// KIRIM DATA
+// =========================
 
 async function kirimData(aksi){
 
@@ -315,7 +391,12 @@ async function kirimData(aksi){
     return;
   }
 
+  // =========================
+  // VALIDASI JAM
+  // =========================
+
   if(
+    !TEST_MODE &&
     aksi === "masuk" &&
     !cekJamMasuk()
   ){
@@ -326,6 +407,7 @@ async function kirimData(aksi){
   }
 
   if(
+    !TEST_MODE &&
     aksi === "pulang" &&
     !cekJamPulang()
   ){
@@ -335,31 +417,50 @@ async function kirimData(aksi){
     return;
   }
 
+  // =========================
+  // AMBIL LOKASI
+  // =========================
+
   const lokasi =
     await ambilLokasi();
 
-const jarak =
-  hitungJarak(
+  const jarak =
+    hitungJarak(
 
-    lokasi.latitude,
-    lokasi.longitude,
+      lokasi.latitude,
+      lokasi.longitude,
 
-    KANTOR_LAT,
-    KANTOR_LNG
+      KANTOR_LAT,
+      KANTOR_LNG
 
-  );
+    );
 
-if(jarak > MAX_RADIUS){
+  // =========================
+  // VALIDASI RADIUS
+  // =========================
 
-  alert(
-    "Anda berada di luar radius kantor"
-  );
+  if(
+    !TEST_MODE &&
+    jarak > MAX_RADIUS
+  ){
 
-  return;
-}
+    alert(
+      "Anda berada di luar radius kantor"
+    );
+
+    return;
+  }
+
+  // =========================
+  // AMBIL FOTO
+  // =========================
 
   const foto =
     ambilFoto();
+
+  // =========================
+  // KIRIM KE APPS SCRIPT
+  // =========================
 
   const response =
     await fetch(URL_SCRIPT,{
@@ -391,6 +492,10 @@ if(jarak > MAX_RADIUS){
   document.getElementById("nama").value="";
 }
 
+// =========================
+// BUTTON
+// =========================
+
 function absenMasuk(){
   kirimData("masuk");
 }
@@ -398,7 +503,6 @@ function absenMasuk(){
 function absenPulang(){
   kirimData("pulang");
 }
-
 
 </script>
 
