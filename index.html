@@ -318,20 +318,15 @@ async function ambilLokasi(){
 
 function ambilFoto(){
 
-  // cek kamera siap
-
-  if(
-    video.videoWidth === 0 ||
-    video.videoHeight === 0
-  ){
-    return null;
+  if(video.videoWidth === 0){
+    return "";
   }
 
   const canvas =
     document.createElement("canvas");
 
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  canvas.width = 320;
+  canvas.height = 240;
 
   const ctx =
     canvas.getContext("2d");
@@ -339,12 +334,14 @@ function ambilFoto(){
   ctx.drawImage(
     video,
     0,
-    0
+    0,
+    320,
+    240
   );
 
   return canvas.toDataURL(
     "image/jpeg",
-    0.8
+    0.3
   );
 }
 
@@ -415,10 +412,11 @@ async function kirimData(aksi){
       await ambilLokasi();
 
     // =========================
-    // FOTO DINONAKTIFKAN
+    // AMBIL FOTO
     // =========================
 
-    const foto = "";
+    const foto =
+  ambilFoto();
 
     // =========================
     // KIRIM DATA
@@ -448,7 +446,7 @@ async function kirimData(aksi){
     });
 
     alert(
-      "Data berhasil dikirim"
+      "Absen Berhasil"
     );
 
     document.getElementById(
