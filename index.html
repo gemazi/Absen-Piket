@@ -318,6 +318,15 @@ async function ambilLokasi(){
 
 function ambilFoto(){
 
+  // cek kamera siap
+
+  if(
+    video.videoWidth === 0 ||
+    video.videoHeight === 0
+  ){
+    return null;
+  }
+
   const canvas =
     document.createElement("canvas");
 
@@ -333,7 +342,10 @@ function ambilFoto(){
     0
   );
 
-  return canvas.toDataURL("image/jpeg");
+  return canvas.toDataURL(
+    "image/jpeg",
+    0.8
+  );
 }
 
 // =========================
@@ -459,7 +471,14 @@ async function kirimData(aksi){
 
   const foto =
     ambilFoto();
+if(!foto){
 
+  alert(
+    "Kamera belum siap"
+  );
+
+  return;
+}
   // =========================
   // KIRIM KE APPS SCRIPT
   // =========================
@@ -468,6 +487,7 @@ async function kirimData(aksi){
     await fetch(URL_SCRIPT,{
 
 		method:"POST",
+mode:"no-cors",
 
 		headers:{
 		"Content-Type":"text/plain;charset=utf-8"
@@ -490,10 +510,7 @@ async function kirimData(aksi){
 
     });
 
-  const hasil =
-    await response.text();
-
-  alert(hasil);
+  alert("Data berhasil dikirim");
 
   document.getElementById("nama").value="";
 }
