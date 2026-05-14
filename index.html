@@ -421,12 +421,15 @@ async function kirimData(aksi){
     // =========================
     // KIRIM DATA
     // =========================
-
+const response =
     await fetch(URL_SCRIPT,{
 
       method:"POST",
 
-      mode:"no-cors",
+      headers:{
+    "Content-Type":
+    "text/plain;charset=utf-8"
+  },
 
       body:JSON.stringify({
 
@@ -445,13 +448,17 @@ async function kirimData(aksi){
 
     });
 
-    alert(
-      "Absen Berhasil"
-    );
+const hasil =
+  await response.text();
 
-    document.getElementById(
-      "nama"
-    ).value = "";
+alert(hasil);
+    //alert(
+      //"Absen Berhasil"
+    //);
+
+    //document.getElementById(
+      //"nama"
+    //).value = "";
 
   }
 
