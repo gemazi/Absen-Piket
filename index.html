@@ -469,7 +469,7 @@ async function kirimData(aksi){
   // AMBIL FOTO
   // =========================
 
-  //const foto =
+  const foto = "";
     //ambilFoto();
 //if(!foto){
 
@@ -487,10 +487,10 @@ async function kirimData(aksi){
     await fetch(URL_SCRIPT,{
 
 		method:"POST",
-mode:"no-cors",
+		mode:"no-cors",
 
-		headers:{
-		"Content-Type":"text/plain;charset=utf-8"
+		//headers:{
+		//"Content-Type":"text/plain;charset=utf-8"
  },
 
       body:JSON.stringify({
@@ -512,7 +512,7 @@ mode:"no-cors",
 
   alert("Data berhasil dikirim");
 
-  document.getElementById("nama").value="";
+ // document.getElementById("nama").value="";
 }
 catch(error){
 
