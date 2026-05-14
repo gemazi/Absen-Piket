@@ -401,97 +401,34 @@ async function kirimData(aksi){
       document.getElementById("nama").value;
 
     if(nama === ""){
+
       alert("Nama wajib diisi");
+
       return;
     }
 
-  // =========================
-  // VALIDASI JAM
-  // =========================
+    // =========================
+    // AMBIL LOKASI
+    // =========================
 
-  if(
-    !TEST_MODE &&
-    aksi === "masuk" &&
-    !cekJamMasuk()
-  ){
-    alert(
-      "Absen masuk hanya jam 18.00-23.59"
-    );
-    return;
-  }
+    const lokasi =
+      await ambilLokasi();
 
-  if(
-    !TEST_MODE &&
-    aksi === "pulang" &&
-    !cekJamPulang()
-  ){
-    alert(
-      "Absen pulang hanya jam 03.00-06.00"
-    );
-    return;
-  }
+    // =========================
+    // FOTO DINONAKTIFKAN
+    // =========================
 
-  // =========================
-  // AMBIL LOKASI
-  // =========================
+    const foto = "";
 
-  const lokasi =
-    await ambilLokasi();
+    // =========================
+    // KIRIM DATA
+    // =========================
 
-  const jarak =
-    hitungJarak(
-
-      lokasi.latitude,
-      lokasi.longitude,
-
-      KANTOR_LAT,
-      KANTOR_LNG
-
-    );
-
-  // =========================
-  // VALIDASI RADIUS
-  // =========================
-
-  if(
-    !TEST_MODE &&
-    jarak > MAX_RADIUS
-  ){
-
-    alert(
-      "Anda berada di luar radius kantor"
-    );
-
-    return;
-  }
-
-  // =========================
-  // AMBIL FOTO
-  // =========================
-
-  const foto = "";
-    //ambilFoto();
-//if(!foto){
-
-  //alert(
-    //"Kamera belum siap"
-  //);
-
-  //return;
-//}
-  // =========================
-  // KIRIM KE APPS SCRIPT
-  // =========================
-
-  const response =
     await fetch(URL_SCRIPT,{
 
-		method:"POST",
-		mode:"no-cors",
+      method:"POST",
 
-		//headers:{
-		//"Content-Type":"text/plain;charset=utf-8"
- },
+      mode:"no-cors",
 
       body:JSON.stringify({
 
@@ -510,11 +447,17 @@ async function kirimData(aksi){
 
     });
 
-  alert("Data berhasil dikirim");
+    alert(
+      "Data berhasil dikirim"
+    );
 
- // document.getElementById("nama").value="";
-}
-catch(error){
+    document.getElementById(
+      "nama"
+    ).value = "";
+
+  }
+
+  catch(error){
 
     console.log(error);
 
@@ -522,18 +465,25 @@ catch(error){
       "Gagal kirim data: " +
       error
     );
-	}
-	}
+
+  }
+
+}
+
 // =========================
 // BUTTON
 // =========================
 
 function absenMasuk(){
+
   kirimData("masuk");
+
 }
 
 function absenPulang(){
+
   kirimData("pulang");
+
 }
 
 </script>
