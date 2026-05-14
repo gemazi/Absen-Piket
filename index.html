@@ -383,13 +383,15 @@ function hitungJarak(lat1,lng1,lat2,lng2){
 
 async function kirimData(aksi){
 
-  const nama =
-    document.getElementById("nama").value;
+  try{
 
-  if(nama === ""){
-    alert("Nama wajib diisi");
-    return;
-  }
+    const nama =
+      document.getElementById("nama").value;
+
+    if(nama === ""){
+      alert("Nama wajib diisi");
+      return;
+    }
 
   // =========================
   // VALIDASI JAM
@@ -465,8 +467,11 @@ async function kirimData(aksi){
   const response =
     await fetch(URL_SCRIPT,{
 
-      method:"POST",
-		mode:"no-cors",
+		method:"POST",
+
+		headers:{
+		"Content-Type":"text/plain;charset=utf-8"
+ },
 
       body:JSON.stringify({
 
@@ -488,11 +493,20 @@ async function kirimData(aksi){
   const hasil =
     await response.text();
 
-  alert("Data berhasil dikirim");
+  alert(hasil);
 
   document.getElementById("nama").value="";
 }
+catch(error){
 
+    console.log(error);
+
+    alert(
+      "Gagal kirim data: " +
+      error
+    );
+	}
+	}
 // =========================
 // BUTTON
 // =========================
