@@ -391,40 +391,40 @@ function hitungJarak(lat1,lng1,lat2,lng2){
 // =========================
 
 async function kirimData(aksi){
+  
+  // 1. TANGKAP ELEMEN TOMBOL YANG DIKLIK
+  const btn = aksi === "masuk" ? document.getElementById("btnMasuk") : document.getElementById("btnPulang");
+  const textAwal = btn.innerHTML; // Simpan teks asli tombol
 
-  try{
-
-    const nama =
-      document.getElementById("nama").value;
+  try {
+    const nama = document.getElementById("nama").value;
 
     if(nama === ""){
-
       alert("Nama wajib diisi");
-
       return;
     }
+
+    // 2. UBAH TOMBOL JADI LOADING & DISABLE
+    btn.innerHTML = "⏳ Sedang Memproses...";
+    btn.disabled = true;
 
     // =========================
     // AMBIL LOKASI
     // =========================
 
-    const lokasi =
-      await ambilLokasi();
+    const lokasi = await ambilLokasi();
 	  
 	  // =========================
     // VALIDASI RADIUS ABSEN
     // =========================
-    if(!TEST_MODE) { // Cek jarak jika tidak dalam Test Mode
-      const jarak = hitungJarak(
-        KANTOR_LAT, 
-        KANTOR_LNG, 
-        lokasi.latitude, 
-        lokasi.longitude
-      );
-
-      // Jika jarak lebih dari MAX_RADIUS (50 M), hentikan proses
+    if(!TEST_MODE) { 
+      const jarak = hitungJarak(KANTOR_LAT, KANTOR_LNG, lokasi.latitude, lokasi.longitude);
       if(jarak > MAX_RADIUS) {
         alert("Gagal! Anda berada di luar area kantor. Jarak Anda saat ini: " + Math.round(jarak) + " meter.");
+        
+        // Kembalikan tombol jika gagal jarak
+        btn.innerHTML = textAwal;
+        btn.disabled = false;
         return; 
       }
     }
@@ -433,64 +433,41 @@ async function kirimData(aksi){
     // AMBIL FOTO
     // =========================
 
-    const foto =
-  ambilFoto();
+    const foto = ambilFoto();
   
     // =========================
     // KIRIM DATA
     // =========================
-const response =
-    await fetch(URL_SCRIPT,{
-
+const response = await fetch(URL_SCRIPT,{
       method:"POST",
-
       headers:{
-    "Content-Type":
-    "text/plain;charset=utf-8"
-  },
-
+        "Content-Type": "text/plain;charset=utf-8"
+      },
       body:JSON.stringify({
-
         nama:nama,
         aksi:aksi,
-
-        latitude:
-          lokasi.latitude,
-
-        longitude:
-          lokasi.longitude,
-
+        latitude: lokasi.latitude,
+        longitude: lokasi.longitude,
         foto:foto
-
       })
-
     });
 
-const hasil =
-  await response.text();
-
-alert(hasil);
-    //alert(
-      //"Absen Berhasil"
-    //);
-
-    //document.getElementById(
-      //"nama"
-    //).value = "";
-
+const hasil = await response.text();
+    alert(hasil);
+    
   }
 
-  catch(error){
-
+  catch(error) {
     console.log(error);
-
-    alert(
-      "Gagal kirim data: " +
-      error
-    );
-
+    alert("Gagal kirim data: " + error);
+  } finally {
+    // 3. KEMBALIKAN TOMBOL KE KONDISI SEMULA SETELAH SELESAI / GAGAL
+    btn.innerHTML = textAwal;
+    btn.disabled = false;
+    
+    // Jalankan ulang cek jam agar tombol yang aktif kembali sesuai aturan
+    updateStatusJam();
   }
-
 }
 
 // =========================
