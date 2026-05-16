@@ -410,6 +410,24 @@ async function kirimData(aksi){
 
     const lokasi =
       await ambilLokasi();
+	  
+	  // =========================
+    // VALIDASI RADIUS ABSEN
+    // =========================
+    if(!TEST_MODE) { // Cek jarak jika tidak dalam Test Mode
+      const jarak = hitungJarak(
+        KANTOR_LAT, 
+        KANTOR_LNG, 
+        lokasi.latitude, 
+        lokasi.longitude
+      );
+
+      // Jika jarak lebih dari MAX_RADIUS (50 M), hentikan proses
+      if(jarak > MAX_RADIUS) {
+        alert("Gagal! Anda berada di luar area kantor. Jarak Anda saat ini: " + Math.round(jarak) + " meter.");
+        return; 
+      }
+    }
 
     // =========================
     // AMBIL FOTO
